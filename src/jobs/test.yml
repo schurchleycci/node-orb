@@ -94,6 +94,25 @@ steps:
               and:
                   - equal: [npm, << parameters.pkg-manager >>]
                   - equal: [jest, << parameters.test-results-for >>]
+                  - equal: [true, << parameters.jest-test-changed-files-only >>]
+                  - << pipeline.git.base_revision >>
+          steps:
+              - run:
+                    name: Check for test reporter
+                    working_directory: <<parameters.app-dir>>
+                    command: npm list jest-junit || (echo "Add the package jest-junit to the dev dependencies of your project with `npm install --save-dev jest-junit`" && exit 1)
+              - run:
+                    name: Run NPM Tests
+                    working_directory: <<parameters.app-dir>>
+                    command: npm run <<parameters.run-command>> -- --reporters=default --reporters=jest-junit --changedSince << pipeline.git.base_revision >>
+    - when: # Run tests for NPM, with jest test results
+          condition:
+              and:
+                  - equal: [npm, << parameters.pkg-manager >>]
+                  - equal: [jest, << parameters.test-results-for >>]
+                  - or:
+                    - equal: [false, << parameters.jest-test-changed-files-only >>]
+                    - not: << pipeline.git.base_revision >>
           steps:
               - run:
                     name: Check for test reporter
