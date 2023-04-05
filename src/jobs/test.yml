@@ -48,6 +48,11 @@ parameters:
             Testing framework your project uses.
             If this is set to jest or mocha, test results will be automatically produced. When using jest, the jest-junit package is required as a dev dependency. See https://github.com/jest-community/jest-junit for more information.
             When using mocha, the mocha-junit-reporter and mocha-multi packages are required as dev dependency. See https://github.com/michaelleeallen/mocha-junit-reporter and https://github.com/glenjamin/mocha-multi for more information.
+    jest-test-changed-files-only:
+        default: false
+        type: boolean
+        description: |
+            If test-results-for is set to jest, setting to true will enable Jest's built-in feature to only run tests related to files that have changed. See https://jestjs.io/docs/cli#--changedsince for more information.
     resource_class:
         default: large
         description: Configure the executor resource class
