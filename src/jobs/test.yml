@@ -53,6 +53,11 @@ parameters:
         type: boolean
         description: |
             If test-results-for is set to jest, setting to true will enable Jest's built-in feature to only run tests related to files that have changed. See https://jestjs.io/docs/cli#--changedsince for more information.
+    base-revision:
+        default: ''
+        type: string
+        description: |
+            Used in conjunction with jest-test-changed-files-only. It should be set to either '<< pipeline.git.base_revision >>' or left blank. 
     resource_class:
         default: large
         description: Configure the executor resource class
@@ -95,7 +100,8 @@ steps:
                   - equal: [npm, << parameters.pkg-manager >>]
                   - equal: [jest, << parameters.test-results-for >>]
                   - equal: [true, << parameters.jest-test-changed-files-only >>]
-                  - << pipeline.git.base_revision >>
+                  - not:
+                    - equal: ['', << parameters.base_revision >>]
           steps:
               - run:
                     name: Check for test reporter
@@ -104,7 +110,7 @@ steps:
               - run:
                     name: Run NPM Tests
                     working_directory: <<parameters.app-dir>>
-                    command: npm run <<parameters.run-command>> -- --reporters=default --reporters=jest-junit --changedSince << pipeline.git.base_revision >>
+                    command: npm run <<parameters.run-command>> -- --reporters=default --reporters=jest-junit --changedSince << parameters.base_revision >>
     - when: # Run tests for NPM, with jest test results
           condition:
               and:
@@ -112,7 +118,7 @@ steps:
                   - equal: [jest, << parameters.test-results-for >>]
                   - or:
                     - equal: [false, << parameters.jest-test-changed-files-only >>]
-                    - not: << pipeline.git.base_revision >>
+                    - equal: ['', << parameters.base_revision >>]
           steps:
               - run:
                     name: Check for test reporter
